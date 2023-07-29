@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Order = MongoDB.Entities.Order;
+﻿using Order = MongoDB.Entities.Order;
 
 namespace JobQueueDemo;
 
@@ -19,14 +18,14 @@ sealed class JobProvider : IJobStorageProvider<JobRecord>
         return db.SaveAsync(job, ct);
     }
 
-    public async Task<IEnumerable<JobRecord>> GetNextBatchAsync(Expression<Func<JobRecord, bool>> match, int batchSize, CancellationToken ct)
+    public async Task<IEnumerable<JobRecord>> GetNextBatchAsync(PendingJobSearchParams<JobRecord> p)
     {
         return await db
             .Find<JobRecord>()
-            .Match(match)
+            .Match(p.Match)
             .Sort(r => r.ID, Order.Ascending)
-            .Limit(batchSize)
-            .ExecuteAsync(ct);
+            .Limit(p.Limit)
+            .ExecuteAsync(p.CancellationToken);
     }
 
     public Task MarkJobAsCompleteAsync(JobRecord job, CancellationToken ct)
@@ -44,14 +43,14 @@ sealed class JobProvider : IJobStorageProvider<JobRecord>
         return db
             .Update<JobRecord>()
             .MatchID(job.ID)
-            .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddHours(1))
+            .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddHours(1)) //re-trying after an hour
             .ExecuteAsync(ct);
 
         // alternatively, you can update the job.ExpireOn property as well to do infinite retries.
     }
 
-    public Task PurgeStaleJobsAsync(Expression<Func<JobRecord, bool>> match, CancellationToken ct)
+    public Task PurgeStaleJobsAsync(StaleJobSearchParams<JobRecord> p)
     {
-        return db.DeleteAsync(match, ct);
+        return db.DeleteAsync(p.Match, p.CancellationToken);
     }
 }
