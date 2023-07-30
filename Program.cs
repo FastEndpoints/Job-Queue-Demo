@@ -1,5 +1,6 @@
 global using FastEndpoints;
 using JobQueueDemo;
+using Microsoft.AspNetCore.Authorization;
 
 var bld = WebApplication.CreateBuilder();
 bld.Services
@@ -13,42 +14,37 @@ app.UseAuthorization()
    .UseJobQueues(o =>
    {
        o.MaxConcurrency = 4;
-       o.ExecutionTimeLimit = TimeSpan.FromSeconds(2);
+       o.ExecutionTimeLimit = TimeSpan.FromSeconds(1);
        o.LimitsFor<SayGoodByeCommand>(
            maxConcurrency: 1,
            timeLimit: TimeSpan.FromSeconds(5));
    });
 app.Run();
 
-sealed class TestJobQueueEndpoint : EndpointWithoutRequest
+[HttpGet("test"), AllowAnonymous]
+sealed class SayHelloEndpoint : EndpointWithoutRequest
 {
-    public override void Configure()
-    {
-        Get("test");
-        AllowAnonymous();
-    }
-
     public override async Task HandleAsync(CancellationToken c)
     {
-        await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, ct) =>
+        await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, _) =>
         {
             await new SayHelloCommand
             {
                 Id = i,
                 Message = "hello executed!"
 
-            }.QueueJobAsync(ct);
+            }.QueueJobAsync();
         });
 
-        await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, ct) =>
-        {
-            await new SayGoodByeCommand
-            {
-                Id = i,
-                Message = "    >>>>>>>>>>>>>>>>>> goodbye executed!"
+        //await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, ct) =>
+        //{
+        //    await new SayGoodByeCommand
+        //    {
+        //        Id = i,
+        //        Message = "    >>>>>>>>>>>>>>>>>> goodbye executed!"
 
-            }.QueueJobAsync(ct);
-        });
+        //    }.QueueJobAsync();
+        //});
 
         await SendAsync("all jobs queued!");
     }

@@ -39,14 +39,13 @@ sealed class JobProvider : IJobStorageProvider<JobRecord>
 
     public Task OnHandlerExecutionFailureAsync(JobRecord job, Exception exception, CancellationToken ct)
     {
-        logger.LogCritical("job-id: {id} command type: {tCommand} ex: {msg}", job.ID, job.Command.GetType().FullName, exception.Message);
+        logger.LogInformation("Rescheduling failed job to be retried after 60 seconds...");
+
         return db
             .Update<JobRecord>()
             .MatchID(job.ID)
-            .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddHours(1)) //re-trying after an hour
+            .Modify(r => r.ExecuteAfter, DateTime.UtcNow.AddMinutes(1))
             .ExecuteAsync(ct);
-
-        // alternatively, you can update the job.ExpireOn property as well to do infinite retries.
     }
 
     public Task PurgeStaleJobsAsync(StaleJobSearchParams<JobRecord> p)

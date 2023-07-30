@@ -20,7 +20,7 @@ sealed class SayHelloHandler : ICommandHandler<SayHelloCommand>
         if (command.Id == 10) // the 10th hello will timeout because max execution time is 1 second
             await Task.Delay(2500, ct);
         else
-            await Task.Delay(1000, ct);
+            await Task.Delay(500, ct);
 
         logger.LogInformation("hello from id: {id} message: {msg}", command.Id, command.Message);
     }

@@ -17,7 +17,7 @@ sealed class SayGoodByeHandler : ICommandHandler<SayGoodByeCommand>
 
     public async Task ExecuteAsync(SayGoodByeCommand command, CancellationToken ct)
     {
-        await Task.Delay(1000, ct);
+        await Task.Delay(500, ct);
 
         logger.LogInformation("goodbye from id: {id} message: {msg}", command.Id, command.Message);
     }

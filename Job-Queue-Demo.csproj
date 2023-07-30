@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="FastEndpoints" Version="5.*" />-->
+    <PackageReference Include="FastEndpoints" Version="5.*" />
     <PackageReference Include="MongoDB.Entities" Version="22.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <ProjectReference Include="..\..\SOURCE-CONTROL\FastEndpoints\Library\Src\Library\FastEndpoints.csproj" />
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>
