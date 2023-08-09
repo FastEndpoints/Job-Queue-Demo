@@ -26,7 +26,7 @@ sealed class SayHelloEndpoint : EndpointWithoutRequest
 {
     public override async Task HandleAsync(CancellationToken c)
     {
-        await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, _) =>
+        for (int i = 1; i <= 10; i++)
         {
             await new SayHelloCommand
             {
@@ -34,7 +34,7 @@ sealed class SayHelloEndpoint : EndpointWithoutRequest
                 Message = "hello executed!"
 
             }.QueueJobAsync();
-        });
+        }
 
         //await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, ct) =>
         //{
@@ -49,3 +49,5 @@ sealed class SayHelloEndpoint : EndpointWithoutRequest
         await SendAsync("all jobs queued!");
     }
 }
+
+public partial class Program { }

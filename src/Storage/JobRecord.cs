@@ -2,7 +2,7 @@
 
 namespace JobQueueDemo;
 
-sealed class JobRecord : Entity, IJobStorageRecord
+public sealed class JobRecord : Entity, IJobStorageRecord
 {
     public string QueueID { get; set; } = default!;
     public object Command { get; set; } = default!;
