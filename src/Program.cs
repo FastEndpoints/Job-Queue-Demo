@@ -21,7 +21,7 @@ app.UseAuthorization()
    });
 app.Run();
 
-[HttpGet("test"), AllowAnonymous]
+[HttpGet("hello"), AllowAnonymous]
 sealed class SayHelloEndpoint : EndpointWithoutRequest
 {
     public override async Task HandleAsync(CancellationToken c)
@@ -35,18 +35,23 @@ sealed class SayHelloEndpoint : EndpointWithoutRequest
 
             }.QueueJobAsync();
         }
-
-        //await Parallel.ForEachAsync(Enumerable.Range(1, 10), async (i, ct) =>
-        //{
-        //    await new SayGoodByeCommand
-        //    {
-        //        Id = i,
-        //        Message = "    >>>>>>>>>>>>>>>>>> goodbye executed!"
-
-        //    }.QueueJobAsync();
-        //});
-
         await SendAsync("all jobs queued!");
+    }
+}
+
+[HttpGet("goodbye/{id}"), AllowAnonymous]
+sealed class GoodByeEndpoint : EndpointWithoutRequest
+{
+    public override async Task HandleAsync(CancellationToken c)
+    {
+        await new SayGoodByeCommand
+        {
+            Id = Route<int>("id"),
+            Message = "bye!"
+
+        }.QueueJobAsync();
+
+        await SendOkAsync();
     }
 }
 

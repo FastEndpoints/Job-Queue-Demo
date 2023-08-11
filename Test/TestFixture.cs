@@ -17,7 +17,8 @@ public class TestFixture : IDisposable
         {
             c.ConfigureTestServices(s =>
             {
-                s.AddJobQueues<JobRecord, TestJobStorageProvider>();
+                s.AddJobQueues<JobRecord, TestJobStorageProvider>(); //register fake storage provider
+                s.RegisterTestCommandHandler<SayGoodByeCommand, TestCommandHandler>(); //register fake handler
             });
         }).CreateClient();
     }
@@ -30,8 +31,8 @@ public class TestFixture : IDisposable
         {
             if (disposing)
             {
-                _factory.Dispose();
                 Client.Dispose();
+                _factory.Dispose();
             }
             disposedValue = true;
         }
