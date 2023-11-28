@@ -1,24 +1,17 @@
-using FastEndpoints;
 using JobQueueDemo;
-using System.Net;
 
 namespace Test;
 
-public class JobExecutionTests : IClassFixture<TestFixture>
+public class JobExecutionTests(TestFixture fixture) : IClassFixture<TestFixture>
 {
-    public readonly HttpClient _client;
-
-    public JobExecutionTests(TestFixture fixture)
-    {
-        _client = fixture.Client;
-    }
+    public readonly HttpClient Client = fixture.Client;
 
     [Fact]
     public async Task Fake_Command_Handler_Executes_Instead_Of_Real_Handler()
     {
-        for (int i = 1; i <= 10; i++)
+        for (var i = 1; i <= 10; i++)
         {
-            var rsp = await _client.GetAsync($"goodbye/{i}");
+            var rsp = await Client.GetAsync($"goodbye/{i}");
             Assert.Equal(HttpStatusCode.OK, rsp.StatusCode);
 
             Assert.True(await TestCommandHandler.IsReceived(i, "bye!"));
@@ -28,7 +21,7 @@ public class JobExecutionTests : IClassFixture<TestFixture>
     [Fact]
     public async Task Fake_Storage_Provider_Receives_Jobs()
     {
-        var (rsp, _) = await _client.GETAsync<SayHelloEndpoint, EmptyResponse>();
+        var (rsp, _) = await Client.GETAsync<SayHelloEndpoint, EmptyResponse>();
         Assert.Equal(HttpStatusCode.OK, rsp.StatusCode);
 
         var ids = await TestJobStorageProvider.GetCommandIDsFor<SayHelloCommand>();

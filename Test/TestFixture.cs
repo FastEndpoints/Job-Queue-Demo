@@ -9,22 +9,26 @@ public class TestFixture : IDisposable
 {
     public HttpClient Client { get; set; }
 
-    private readonly WebApplicationFactory<Program> _factory = new();
+    readonly WebApplicationFactory<Program> _factory = new();
 
     public TestFixture()
     {
-        Client = _factory.WithWebHostBuilder(c =>
-        {
-            c.ConfigureTestServices(s =>
+        Client = _factory.WithWebHostBuilder(
+            c =>
             {
-                s.AddJobQueues<JobRecord, TestJobStorageProvider>(); //register fake storage provider
-                s.RegisterTestCommandHandler<SayGoodByeCommand, TestCommandHandler>(); //register fake handler
-            });
-        }).CreateClient();
+                c.ConfigureTestServices(
+                    s =>
+                    {
+                        s.AddJobQueues<JobRecord, TestJobStorageProvider>();                   //register fake storage provider
+                        s.RegisterTestCommandHandler<SayGoodByeCommand, TestCommandHandler>(); //register fake handler
+                    });
+            }).CreateClient();
     }
 
-    #region disposable
-    private bool disposedValue;
+#region disposable
+
+    bool disposedValue;
+
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
@@ -43,5 +47,6 @@ public class TestFixture : IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
-    #endregion
+
+#endregion
 }

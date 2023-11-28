@@ -2,19 +2,12 @@
 
 sealed class SayGoodByeCommand : ICommand
 {
-    public int Id { get; set; }
-    public string Message { get; set; } = default!;
+    public int Id { get; init; }
+    public string Message { get; init; } = default!;
 }
 
-sealed class SayGoodByeHandler : ICommandHandler<SayGoodByeCommand>
+sealed class SayGoodByeHandler(ILogger<SayGoodByeHandler> logger) : ICommandHandler<SayGoodByeCommand>
 {
-    private readonly ILogger<SayGoodByeHandler> logger;
-
-    public SayGoodByeHandler(ILogger<SayGoodByeHandler> logger)
-    {
-        this.logger = logger;
-    }
-
     public async Task ExecuteAsync(SayGoodByeCommand command, CancellationToken ct)
     {
         await Task.Delay(500, ct);
