@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using JobQueueDemo;
+﻿using JobQueueDemo;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 

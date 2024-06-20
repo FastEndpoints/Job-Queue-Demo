@@ -20,6 +20,13 @@ sealed class JobProvider(DbContext db, ILogger<JobProvider> logger) : IJobStorag
              .Modify(r => r.IsComplete, true)
              .ExecuteAsync(ct);
 
+    public  Task CancelJobAsync(Guid trackingId, CancellationToken ct)
+        => db.Update<JobRecord>()
+             .Match(r => r.TrackingID == trackingId)
+             .Modify(r => r.IsComplete, true)
+             .Modify(r => r.IsCancelled, true) //just for demonstration of custom fields
+             .ExecuteAsync(ct);
+
     public Task OnHandlerExecutionFailureAsync(JobRecord job, Exception exception, CancellationToken ct)
     {
         logger.LogInformation("Rescheduling failed job to be retried after 60 seconds...");

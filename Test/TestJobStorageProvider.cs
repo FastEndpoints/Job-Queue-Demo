@@ -1,6 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Collections.Concurrent;
 using JobQueueDemo;
-using System.Collections.Concurrent;
 
 namespace Test;
 
@@ -30,6 +29,9 @@ public sealed class TestJobStorageProvider : IJobStorageProvider<JobRecord>
 
         return Task.CompletedTask;
     }
+
+    public  Task CancelJobAsync(Guid trackingId, CancellationToken ct)
+        => Task.CompletedTask;
 
     public Task OnHandlerExecutionFailureAsync(JobRecord r, Exception x, CancellationToken ct)
         => Task.CompletedTask;
