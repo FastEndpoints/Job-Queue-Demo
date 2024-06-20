@@ -13,6 +13,7 @@ app.UseAuthorization()
        {
            o.MaxConcurrency = 4;
            o.ExecutionTimeLimit = TimeSpan.FromSeconds(1);
+           o.LimitsFor<LongRunningCommand>(1, TimeSpan.FromSeconds(60));
            o.LimitsFor<SayGoodByeCommand>(
                maxConcurrency: 1,
                timeLimit: TimeSpan.FromSeconds(5));
@@ -48,6 +49,25 @@ sealed class GoodByeEndpoint : EndpointWithoutRequest
         }.QueueJobAsync(ct: c);
 
         await SendOkAsync(c);
+    }
+}
+
+[HttpGet("cancellation"), AllowAnonymous]
+sealed class JobCancellationSampleEndpoint : EndpointWithoutRequest
+{
+    public override async Task HandleAsync(CancellationToken c)
+    {
+        var trackingId = await new LongRunningCommand().QueueJobAsync(ct: c);
+
+        _ = Task.Run(
+            async () =>
+            {
+                await Task.Delay(5000, c);
+                await JobTracker<LongRunningCommand>.CancelJobAsync(trackingId, c);
+            },
+            c);
+
+        await SendAsync("long running job queued! it will be cancelled after 5 seconds. check the console log for updates.", cancellation: c);
     }
 }
 
