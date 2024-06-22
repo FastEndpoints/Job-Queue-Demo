@@ -25,9 +25,9 @@ public class JobExecutionTests(TestFixture fixture) : IClassFixture<TestFixture>
         Assert.Equal(HttpStatusCode.OK, rsp.StatusCode);
 
         var ids = await TestJobStorageProvider.GetCommandIDsFor<SayHelloCommand>();
-        Assert.True(ids.Count() == 9);
+        Assert.Equal(9, ids.Count());
 
         var expectedIds = Enumerable.Range(1, 9);
-        Assert.True(!expectedIds.Except(ids).Any());
+        Assert.False(expectedIds.Except(ids).Any());
     }
 }

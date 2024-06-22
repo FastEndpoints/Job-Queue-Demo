@@ -26,19 +26,19 @@ public class TestFixture : IDisposable
 
 #region disposable
 
-    bool disposedValue;
+    bool _disposedValue;
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (_disposedValue)
+            return;
+
+        if (disposing)
         {
-            if (disposing)
-            {
-                Client.Dispose();
-                _factory.Dispose();
-            }
-            disposedValue = true;
+            Client.Dispose();
+            _factory.Dispose();
         }
+        _disposedValue = true;
     }
 
     public void Dispose()
